@@ -11,17 +11,19 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# --- Sample Chatbot Knowledge Base ---
+# --- TSU Branding ---
+st.set_page_config(page_title="TSU AI Student Success", layout="centered")
+st.image("https://www.tnstate.edu/images/TSU_Logo.png", width=200)
+st.title("🎓 TSU AI-Powered Student Success Platform")
+
+# --- Expanded Chatbot Knowledge Base ---
 chatbot_data = [
-    {"module": "Academic Advising", "question": "How do I register for classes?", "response": "You can register via the Banner system under Student Services > Registration."},
-    {"module": "Academic Advising", "question": "What are the prerequisites for Calculus II?", "response": "Calculus I with a grade of C or better is required."},
-    {"module": "Academic Advising", "question": "How can I drop a class?", "response": "You can drop a class through the Banner system before the drop deadline."},
-    {"module": "Financial Aid", "question": "How do I apply for financial aid?", "response": "Fill out the FAFSA form at studentaid.gov and use TSU's school code."},
-    {"module": "Financial Aid", "question": "When will I receive my financial aid?", "response": "Aid is disbursed within the first two weeks of the semester."},
-    {"module": "Financial Aid", "question": "What scholarships are available?", "response": "Visit the TSU Scholarships Office website for a full list of current scholarships."},
-    {"module": "Course Registration", "question": "What classes are required for my major?", "response": "Check your Degree Works audit or contact your academic advisor."},
-    {"module": "Course Registration", "question": "Can I register for a class without the prerequisite?", "response": "You need special permission from the department to override prerequisites."},
-    {"module": "Course Registration", "question": "Why can't I register for a class?", "response": "Check for holds on your account or if the class is full."}
+    {"module": "Academic Advising", "question": "How do I register for classes?", "response": "Register through TSU Banner Self-Service under Student Services."},
+    {"module": "Academic Advising", "question": "How can I drop a class?", "response": "You can drop courses via Banner or consult your advisor before the drop deadline."},
+    {"module": "Financial Aid", "question": "How do I apply for financial aid?", "response": "Submit your FAFSA at studentaid.gov and use TSU’s school code 003522."},
+    {"module": "Tutoring", "question": "Where can I get help with math or writing?", "response": "TSU Learning Support Centers offer tutoring—visit the library or online tutoring portal."},
+    {"module": "Mental Health", "question": "Who do I talk to about mental health?", "response": "Contact TSU Counseling Center at (615) 963-5611 or visit Floyd-Payne Campus Center Room 304."},
+    {"module": "IT Help", "question": "I forgot my TSU email password.", "response": "Visit helpdesk.tnstate.edu or call IT Help Desk at (615) 963-7777."}
 ]
 chatbot_df = pd.DataFrame(chatbot_data)
 
@@ -38,16 +40,12 @@ risk_df['Risk Score'] = ((2.3 - risk_df['GPA']) / 2.3 + (70 - risk_df['Attendanc
 risk_df['Risk Score'] = risk_df['Risk Score'].clip(0, 1)
 risk_df['Risk Level'] = pd.cut(risk_df['Risk Score'], bins=[0, 0.4, 0.7, 1], labels=['Low', 'Medium', 'High'])
 
-# --- Streamlit App ---
-st.set_page_config(page_title="TSU AI Platform", layout="centered")
-st.title("🎓 TSU AI-Powered Student Success App")
-
 tab1, tab2 = st.tabs(["🤖 Chatbot Assistant", "📊 Risk Dashboard"])
 
 # --- Chatbot Tab ---
 with tab1:
     st.subheader("AI Chatbot Assistant")
-    st.markdown("Ask questions about **academic advising**, **financial aid**, or **course registration**.")
+    st.markdown("Ask about TSU advising, financial aid, IT, tutoring, or wellness services.")
     user_input = st.text_input("Ask a question:")
 
     def get_response(user_input):
@@ -55,7 +53,7 @@ with tab1:
         for _, row in chatbot_df.iterrows():
             if any(word in user_input for word in row["question"].lower().split()):
                 return f"**[{row['module']}]** {row['response']}"
-        return "I'm sorry, I couldn't find an answer to your question. Please contact your advisor."
+        return "I’m sorry, I couldn’t find the answer. Please contact your TSU advisor or support office."
 
     if user_input:
         st.markdown(get_response(user_input))
@@ -69,3 +67,7 @@ with tab2:
     else:
         filtered_df = risk_df
     st.dataframe(filtered_df, use_container_width=True)
+    st.download_button("Download CSV", data=filtered_df.to_csv(index=False), file_name="tsu_risk_data.csv")
+
+st.markdown("---")
+st.caption("🔵 Powered by TSU Office of Academic Affairs • [tnstate.edu](https://www.tnstate.edu)")
